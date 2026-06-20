@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快艇骰子 - Yacht Dice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">快艇骰子</h1>
+            <p class="game-subtitle">Yacht Dice</p>
+        </header>
+
+        <main class="game-main">
+            <section class="dice-section">
+                <div class="dice-wrapper">
+                    <canvas id="dice0" class="dice-canvas" width="80" height="80" data-index="0"></canvas>
+                    <canvas id="dice1" class="dice-canvas" width="80" height="80" data-index="1"></canvas>
+                    <canvas id="dice2" class="dice-canvas" width="80" height="80" data-index="2"></canvas>
+                    <canvas id="dice3" class="dice-canvas" width="80" height="80" data-index="3"></canvas>
+                    <canvas id="dice4" class="dice-canvas" width="80" height="80" data-index="4"></canvas>
+                </div>
+                <p class="dice-hint">点击骰子选中/取消选中，选中的骰子保留不摇</p>
+
+                <div class="controls">
+                    <button id="rollBtn" class="btn btn-primary btn-roll">
+                        <span class="btn-text">摇骰子</span>
+                        <span class="rolls-badge">剩余 <span id="rollsLeft">3</span> 次</span>
+                    </button>
+                    <button id="newGameBtn" class="btn btn-secondary">新游戏</button>
+                </div>
+
+                <div class="high-score-box">
+                    <span class="high-score-label">历史最高分</span>
+                    <span class="high-score-value" id="highScore">0</span>
+                </div>
+            </section>
+
+            <section class="score-section">
+                <h2 class="score-title">计分板</h2>
+                
+                <div class="score-category">
+                    <h3 class="category-title">上半部分</h3>
+                    <div class="score-list">
+                        <div class="score-item" data-category="ones">
+                            <span class="score-name">1点</span>
+                            <span class="score-value" data-score="ones">-</span>
+                        </div>
+                        <div class="score-item" data-category="twos">
+                            <span class="score-name">2点</span>
+                            <span class="score-value" data-score="twos">-</span>
+                        </div>
+                        <div class="score-item" data-category="threes">
+                            <span class="score-name">3点</span>
+                            <span class="score-value" data-score="threes">-</span>
+                        </div>
+                        <div class="score-item" data-category="fours">
+                            <span class="score-name">4点</span>
+                            <span class="score-value" data-score="fours">-</span>
+                        </div>
+                        <div class="score-item" data-category="fives">
+                            <span class="score-name">5点</span>
+                            <span class="score-value" data-score="fives">-</span>
+                        </div>
+                        <div class="score-item" data-category="sixes">
+                            <span class="score-name">6点</span>
+                            <span class="score-value" data-score="sixes">-</span>
+                        </div>
+                    </div>
+                    <div class="score-total upper-total">
+                        <span class="total-label">上半部分合计</span>
+                        <span class="total-value" id="upperTotal">0</span>
+                    </div>
+                </div>
+
+                <div class="score-category">
+                    <h3 class="category-title">下半部分</h3>
+                    <div class="score-list">
+                        <div class="score-item" data-category="threeOfAKind">
+                            <span class="score-name">三条</span>
+                            <span class="score-value" data-score="threeOfAKind">-</span>
+                        </div>
+                        <div class="score-item" data-category="fourOfAKind">
+                            <span class="score-name">四条</span>
+                            <span class="score-value" data-score="fourOfAKind">-</span>
+                        </div>
+                        <div class="score-item" data-category="fullHouse">
+                            <span class="score-name">满堂</span>
+                            <span class="score-value" data-score="fullHouse">-</span>
+                        </div>
+                        <div class="score-item" data-category="smallStraight">
+                            <span class="score-name">小顺</span>
+                            <span class="score-value" data-score="smallStraight">-</span>
+                        </div>
+                        <div class="score-item" data-category="largeStraight">
+                            <span class="score-name">大顺</span>
+                            <span class="score-value" data-score="largeStraight">-</span>
+                        </div>
+                        <div class="score-item" data-category="yacht">
+                            <span class="score-name">快艇</span>
+                            <span class="score-value" data-score="yacht">-</span>
+                        </div>
+                        <div class="score-item" data-category="chance">
+                            <span class="score-name">机会</span>
+                            <span class="score-value" data-score="chance">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="score-grand-total">
+                    <span class="grand-label">总分</span>
+                    <span class="grand-value" id="grandTotal">0</span>
+                </div>
+
+                <p class="score-hint">点击计分项目记录当前骰子的得分（每轮结束后选择一项）</p>
+            </section>
+        </main>
+    </div>
+
+    <div id="gameOverModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">游戏结束</h2>
+            <div class="modal-score">
+                <p class="final-score-label">最终得分</p>
+                <p class="final-score-value" id="finalScore">0</p>
+            </div>
+            <div class="modal-high-score">
+                <p class="high-score-text" id="highScoreText">历史最高分</p>
+                <p class="high-score-num" id="modalHighScore">0</p>
+            </div>
+            <button id="playAgainBtn" class="btn btn-primary btn-block">再来一局</button>
+        </div>
+    </div>
+
+    <script src="dice.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
