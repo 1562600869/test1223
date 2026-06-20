@@ -66,7 +66,6 @@ class YachtGame {
 
     handleDiceClick(index) {
         if (this.rolling || this.isFirstRoll) return;
-        if (this.rollsLeft === 3) return;
 
         this.selected[index] = !this.selected[index];
         this.diceRenderers[index].setSelected(this.selected[index]);
@@ -82,6 +81,9 @@ class YachtGame {
     rollDice() {
         if (this.isFirstRoll) {
             this.selected = [false, false, false, false, false];
+            for (let i = 0; i < 5; i++) {
+                this.diceRenderers[i].setSelected(false);
+            }
             this.isFirstRoll = false;
             this.canScore = false;
         }
@@ -140,13 +142,14 @@ class YachtGame {
     }
 
     resetForNextRound() {
+        this.dice = [1, 1, 1, 1, 1];
         this.selected = [false, false, false, false, false];
         this.rollsLeft = 3;
         this.isFirstRoll = true;
         this.canScore = false;
 
         for (let i = 0; i < 5; i++) {
-            this.diceRenderers[i].setSelected(false);
+            this.diceRenderers[i].draw(this.dice[i], false);
         }
     }
 
