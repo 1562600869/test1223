@@ -263,11 +263,13 @@ body {
 .score-item.filled {
     background: var(--bg-cream);
     cursor: default;
+    pointer-events: none;
 }
 
 .score-item.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    pointer-events: none;
 }
 
 .score-name {

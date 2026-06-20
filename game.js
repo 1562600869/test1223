@@ -2,7 +2,7 @@ class YachtGame {
     constructor() {
         this.dice = [1, 1, 1, 1, 1];
         this.selected = [false, false, false, false, false];
-        this.rollsLeft = 3;
+        this.rollCount = 0;
         this.isFirstRoll = true;
         this.canScore = false;
         this.scores = {
@@ -57,7 +57,12 @@ class YachtGame {
 
         const scoreItems = document.querySelectorAll('.score-item');
         scoreItems.forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', (e) => {
+                if (item.classList.contains('filled')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
                 const category = item.dataset.category;
                 this.handleScoreClick(category);
             });
@@ -72,7 +77,7 @@ class YachtGame {
     }
 
     handleRollClick() {
-        if (this.rolling || this.rollsLeft <= 0) return;
+        if (this.rolling || this.rollCount >= 3) return;
         if (this.isGameOver()) return;
 
         this.rollDice();
@@ -88,8 +93,8 @@ class YachtGame {
             this.canScore = false;
         }
 
+        this.rollCount++;
         this.rolling = true;
-        this.rollsLeft--;
 
         const diceToRoll = [];
         for (let i = 0; i < 5; i++) {
@@ -123,10 +128,10 @@ class YachtGame {
     }
 
     handleScoreClick(category) {
+        if (this.scores[category] !== null) return;
         if (this.rolling) return;
         if (this.isFirstRoll) return;
         if (!this.canScore) return;
-        if (this.scores[category] !== null) return;
         if (this.isGameOver()) return;
 
         const score = this.calculateScore(category);
@@ -144,7 +149,7 @@ class YachtGame {
     resetForNextRound() {
         this.dice = [1, 1, 1, 1, 1];
         this.selected = [false, false, false, false, false];
-        this.rollsLeft = 3;
+        this.rollCount = 0;
         this.isFirstRoll = true;
         this.canScore = false;
 
@@ -281,7 +286,7 @@ class YachtGame {
     newGame() {
         this.dice = [1, 1, 1, 1, 1];
         this.selected = [false, false, false, false, false];
-        this.rollsLeft = 3;
+        this.rollCount = 0;
         this.isFirstRoll = true;
         this.canScore = false;
         this.rolling = false;
@@ -311,10 +316,10 @@ class YachtGame {
     }
 
     updateUI() {
-        document.getElementById('rollsLeft').textContent = this.rollsLeft;
+        document.getElementById('rollsLeft').textContent = 3 - this.rollCount;
 
         const rollBtn = document.getElementById('rollBtn');
-        rollBtn.disabled = this.rolling || this.rollsLeft <= 0 || this.isGameOver();
+        rollBtn.disabled = this.rolling || this.rollCount >= 3 || this.isGameOver();
 
         Object.keys(this.scores).forEach(category => {
             const scoreEl = document.querySelector(`[data-score="${category}"]`);
@@ -323,7 +328,7 @@ class YachtGame {
             if (this.scores[category] !== null) {
                 scoreEl.textContent = this.scores[category];
                 itemEl.classList.add('filled');
-                itemEl.classList.remove('disabled');
+                itemEl.classList.add('disabled');
             } else {
                 if (this.canScore && !this.isGameOver()) {
                     const previewScore = this.calculateScore(category);
@@ -347,8 +352,7 @@ class YachtGame {
     }
 
     loadHighScore() {
-        const saved = localStorage.getItem('yachtHighScore');
-        return saved ? parseInt(saved, 10) : 0;
+        return parseInt(localStorage.getItem('yachtHighScore'), 10) || 0;
     }
 
     saveHighScore() {
